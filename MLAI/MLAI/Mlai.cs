@@ -17,19 +17,31 @@ namespace MLAI
 {
     class Mlai
     {
-        static readonly string _trainDataPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\TrainingSignals.csv");
-        static readonly string _testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\TrainingSignals1.csv");
-        static readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\Model.zip");
-        public TextLoader _textLoader;
-        public MLContext mlContext;
+       
+        //public TextLoader textLoader;
+        //public MLContext mlContext;
 
-        public RegressionEvaluator.Result CreateAModel()
+        public MLContext CreateAMLContext()
         {
-            RegressionEvaluator.Result result=null;
+            MLContext mlContext = null;
             try
             {
-                mlContext = new MLContext(0, 0);
-                _textLoader = mlContext.Data.TextReader(new TextLoader.Arguments()
+                mlContext = new MLContext(seed:0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " + ex + "   " + ex.StackTrace);
+            }
+            return mlContext;
+        }
+
+        public TextLoader CreateATextLoader(MLContext mlContext)
+        {
+            TextLoader textLoader = null;
+            try
+            {
+               
+                textLoader = mlContext.Data.TextReader(new TextLoader.Arguments()
                 {
                     Separator = ";",
                     HasHeader = true,
@@ -58,47 +70,44 @@ namespace MLAI
                     new TextLoader.Column("RfdX", DataKind.R4, 20),
                 }
                 });
-                var model = Train(mlContext, _trainDataPath);
-                result = Evaluate(mlContext, model);
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " + ex + "   " + ex.StackTrace);
             }
-            return result;
+            return textLoader;
         }
 
-        public ITransformer Train(MLContext mlContext, string dataPath)
+        public ITransformer Train(MLContext mlContext, string dataPath, TextLoader textLoader, string finishedModelPath)
         {
-            IDataView dataView = _textLoader.Read(dataPath);
+            IDataView dataView = textLoader.Read(dataPath);
 
             var pipeline = mlContext.Transforms.CopyColumns("RfdX", "Label")
                 .Append(mlContext.Transforms.Concatenate("Features", "Sig1", "Sig2", "Sig3", "Sig4", "Sig5", "Sig6", "Sig7", "Sig8", "Sig9", "Sig10", "Sig11", "Sig12", "Sig13", "Sig14", "Sig15", "Sig16", "Sig17", "Sig18", "Sig19", "Sig20"))
                 .Append(mlContext.Regression.Trainers.FastTree());
             var model = pipeline.Fit(dataView);
-            SaveModelAsFile(mlContext, model);
+            SaveModelAsFile(mlContext, model, finishedModelPath);
             return model;
         }
 
-        private static void SaveModelAsFile(MLContext mlContext, ITransformer model)
+        private static void SaveModelAsFile(MLContext mlContext, ITransformer model, string modelPath)
         {
-            using (var fileStream = new FileStream(_modelPath, FileMode.Create, FileAccess.Write, FileShare.Write))
+            using (var fileStream = new FileStream(modelPath, FileMode.Create, FileAccess.Write, FileShare.Write))
                 mlContext.Model.Save(model, fileStream);
         }
 
-        private RegressionEvaluator.Result Evaluate(MLContext mlContext, ITransformer model)
+        public RegressionEvaluator.Result Evaluate(MLContext mlContext, ITransformer model, string testDataPath, TextLoader textLoader)
         {
-            IDataView dataView = _textLoader.Read(_testDataPath);
+            IDataView dataView = textLoader.Read(testDataPath);
             var predictions = model.Transform(dataView);
             RegressionEvaluator.Result metrics = mlContext.Regression.Evaluate(predictions, "Label", "Score");
             return metrics;
         }
 
-        public float TestSinglePrediction(List<double> signal)
+        public float TestSinglePrediction(List<double> signal, MLContext mlContext, string modelPath)
         {
             ITransformer loadedModel;
-            using (var stream = new FileStream(_modelPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var stream = new FileStream(modelPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 loadedModel = mlContext.Model.Load(stream);
             }
@@ -125,6 +134,7 @@ namespace MLAI
                 Sig18 = (float)signal[17],
                 Sig19 = (float)signal[18],
                 Sig20 = (float)signal[19],
+                RfdX = 0
 
             };
             var prediction = predictionFunction.Predict(abstractSignal);

@@ -10,7 +10,7 @@ using Microsoft.ML.Runtime.Api;
 
 namespace MLAI
 {
-    class AbstractSignal
+    public class AbstractSignal
     {
         [Column("0")]
         public float Sig1;
@@ -71,5 +71,8 @@ namespace MLAI
 
         [Column("19")]
         public float Sig20;
+
+        [Column("20")]
+        public float RfdX;
     }
 }

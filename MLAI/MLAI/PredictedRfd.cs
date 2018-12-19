@@ -8,7 +8,7 @@ using Microsoft.ML.Runtime.Api;
 
 namespace MLAI
 {
-    class PredictedRfd
+    public class PredictedRfd
     {
         [ColumnName("Score")]
         public float RfdX;
