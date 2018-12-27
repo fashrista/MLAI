@@ -11,10 +11,10 @@ namespace MLAI
     class Program
     {
         //paths to training and testing data , and also path to trained model 
-        static readonly string trainDataPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\TrainingSignals.csv");
-        static readonly string testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\TrainingSignals1.csv");
-        static readonly string modelPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\Model.zip");
-        static readonly string serverPath = Path.Combine(Environment.CurrentDirectory, "Data", @"C:\Users\Asus\AppData\LocalLow\S2P\Muscle board\server.csv");
+        static readonly string trainDataPath = Path.Combine(Environment.CurrentDirectory, "Data", @"TrainingSignals.csv");
+        static readonly string testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", @"TrainingSignals1.csv");
+        static readonly string modelPath = Path.Combine(Environment.CurrentDirectory, "Data", @"Model.zip");
+        
         static void Main(string[] args)
         {
             Mlai mlai = new Mlai();
