@@ -15,7 +15,7 @@ using Microsoft.ML.Transforms.Text;
 
 namespace MLAI
 {
-    class Mlai
+    public class Mlai
     {
        
         //public TextLoader textLoader;
