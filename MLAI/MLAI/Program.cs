@@ -26,6 +26,7 @@ namespace MLAI
             Console.WriteLine("RSquared:  " + result.RSquared + "  RMS: " + result.Rms);
             List<double> signal = new List<double>() {31, 14,  133,  22 , 11 , 11,  16 , 18 , 12 ,12 ,14 ,11 ,13 ,14 ,15 ,143 ,484523,  123 ,   123 ,   957};
             float rfd = mlai.TestSinglePrediction(signal, mlContext, modelPath);
+
             Console.WriteLine("prediction:  " + rfd );
             Console.ReadKey();
         }
